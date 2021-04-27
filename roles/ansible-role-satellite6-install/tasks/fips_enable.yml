@@ -1,0 +1,63 @@
+- name: Check if system supports AES-NI
+  command: grep -q -m1 -o aes /proc/cpuinfo
+  failed_when: aesni_supported.rc > 1
+  register: aesni_supported
+
+- name: Ensure dracut-fips-aesni is installed
+  yum:
+    name: dracut-fips-aesni
+    state: present
+
+- name: install dracut-fips
+  yum:
+    name: dracut-fips
+    state: present
+
+- name: Rebuild initramfs
+  command: dracut -f
+
+- name: check fips argument exists
+  command: grep 'GRUB_CMDLINE_LINUX.*fips=' /etc/default/grub
+  failed_when: false
+  register: fipsargcheck
+
+
+- name: replace existing fips argument
+  replace:
+    path: /etc/default/grub
+    regexp: fips=.
+    replace: fips=1
+
+- name: add fips argument
+  replace:
+    path: /etc/default/grub
+    regexp: (GRUB_CMDLINE_LINUX=.*)"
+    replace: \1 fips=1"
+
+- name: get boot device uuid
+  command: findmnt --noheadings --output uuid --target /boot
+  register: bootuuid
+
+- name: check boot argument exists
+  command: grep 'GRUB_CMDLINE_LINUX.*boot=' /etc/default/grub
+  failed_when: false
+  register: bootargcheck
+
+
+- name: replace existing boot argument
+  replace:
+    path: /etc/default/grub
+    regexp: boot=\w*-\w*-\w*-\w*-\w*
+    replace: boot={{ bootuuid.stdout }}
+
+- name: add boot argument
+  replace:
+    path: /etc/default/grub
+    regexp: (GRUB_CMDLINE_LINUX=.*)"
+    replace: \1 boot=UUID={{ bootuuid.stdout }}"
+
+- name: update bootloader menu
+  command: /sbin/grubby --update-kernel=ALL --args="fips=1 boot=UUID={{ bootuuid.stdout }}"
+
+- name: Reboot After FIPS is enabled
+  reboot:

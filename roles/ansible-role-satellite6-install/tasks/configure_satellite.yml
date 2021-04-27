@@ -1,0 +1,37 @@
+---
+#Create Hammer directory on /root
+- name: "Configure | create .hammer directory on user"
+  file:
+    path: "~/.hammer"
+    state: "directory"
+    mode: "0755"
+
+#Copy the hammer configuration from template to the .hammer directory
+- name: "Configure | set configuration for hammer from template"
+  template:
+    src: "hammer_config.yml.j2"
+    dest: "~/.hammer/cli_config.yml"
+
+- name: Run Manifest Role
+    include_role: redhat.satellite.manifest
+
+# Enable immediate Download Policy
+- redhat.satellite.setting:
+    username: "{{satellite_username }}"
+    password: "{{ satellite_password }}"
+    server_url: "https://{{ satellite_server_url }}"
+    name: "default_download_policy"
+    value: "immediate"
+
+- name: Run Repo Role
+    include_role: redhat.satellite.repositories
+
+- name: Sync all repos
+  redhat.satellite.repository_sync:
+    username: "{{satellite_username }}"
+    password: "{{ satellite_password }}"
+    server_url: "https://{{ satellite_server_url }}"
+    product: "{{ item.name }}"
+    organization: "{{ satellite_organization }}"
+  loop: "{{ satellite_products }}"
+

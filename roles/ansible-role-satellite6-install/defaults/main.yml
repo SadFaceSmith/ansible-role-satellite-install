@@ -1,0 +1,146 @@
+---
+# defaults file 
+# Go over variables below and pass them in extra vars, playbook vars,
+# vars_files, inventory file or whatever which overwrite these values!
+
+
+# main:
+# version should be double! Not string!
+
+satellite_deployment_version: 6.9
+satellite_deployment_hostname_short: "sat-testing"
+satellite_deployment_hostname_full: "sat-testing.example.com"
+satellite_deployment_admin_username: ""
+satellite_deployment_admin_password: ""
+satellite_deployment_organization: "VMC"
+satellite_deployment_location: "MGT"
+
+# registration:
+satellite_connected: "True"  ## True for connected / False for Disconnected
+satellite_deployment_rhn_user: ""
+satellite_deployment_rhn_password: ""
+
+
+
+satellite_deployment_answers:
+  "foreman-initial-organization": "{{ satellite_deployment_organization }}"
+  "foreman-initial-location": "{{ satellite_deployment_location }}"
+  "foreman-initial-admin-username": "{{ satellite_deployment_admin_username }}"
+  "foreman-initial-admin-password": "{{ satellite_deployment_admin_password }}"
+
+# Configure_satellite:
+satellite_server_url: "https://{{ satellite_deployment_hostname_full }}"
+satellite_username: "{{ satellite_deployment_admin_username }}"
+satellite_password: "{{ satellite_deployment_admin_password }}"
+satellite_organization: "{{ satellite_deployment_organization }}"
+satellite_manifest_path: "~/manifest.zip"
+
+
+satellite_products:
+  - name: Red Hat Enterprise Linux Server
+    repository_sets:
+      - name: Red Hat Enterprise Linux 7 Server (RPMs)
+        basearch: x86_64
+        releasever: 7Server
+      - name: Red Hat Enterprise Linux 7 Server - Extras (RPMs)
+        basearch: x86_64
+      - name: Red Hat Enterprise Linux 7 Server - Optional (RPMs)
+        basearch: x86_64
+  - name: Red Hat Software Collections (for RHEL Server)
+    repository_sets:
+      - name: Red Hat Software Collections RPMs for Red Hat Enterprise Linux 7 Server
+        basearch: x86_64
+        releasever: 7Server
+  - name: Red Hat Enterprise Linux for x86_64
+    repository_sets:
+      - name: Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)
+        releasever: 8
+      - name: Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)
+        releasever: 8
+  - name: Red Hat Software Collections (for RHEL Server)
+    all_repositories: True
+  - name: Red Hat Ansible Automation Platform
+    all_repositories: True
+  - name: Red Hat Advanced Cluster Management for Kubernetes 
+    all_repositories: True
+
+
+
+# configure_capsules:
+satellite_deployment_puppet_env: "production"
+
+
+satellite_deployment_packages:
+  "6.9":
+    - "satellite"
+
+satellite_deployment_install_repos:
+  "6.9":
+    - "rhel-7-server-rpms"
+    - "rhel-server-rhscl-7-rpms"
+    - "rhel-7-server-satellite-6.9-rpms"
+    - "rhel-7-server-satellite-maintenance-6-rpms"
+    - "rhel-7-server-ansible-2.9-rpms"
+    - "rhel-7-server-rh-common-rpms"
+# Packages
+satellite_deployment_extra_packages:
+  - "wget"
+  - "git"
+  - "net-tools"
+  - "bash-completion"
+  - "screen"
+  - "vim-*"
+
+# Firewall Ports
+satellite_deployment_fw_ports:
+    - 22/tcp
+    - 80/tcp
+    - 443/tcp
+    - 5646/tcp
+    - 5647/tcp
+    - 5671/tcp
+    - 5674/tcp
+    - 8140/tcp
+    - 9090/tcp
+    - 53/udp
+    - 53/tcp
+    - 67/udp
+    - 68/udp
+    - 69/udp
+
+
+satellite_deployment_installer_cmd: "/usr/sbin/satellite-installer
+  --scenario satellite"
+
+
+# IPA Enabled / Disabled
+satellite_ipa_integrated: "false"
+
+
+# network
+satellite_deployment_ip_address: "192.168.X.X"
+satellite_deployment_network_address: "192.168.X.X"
+satellite_deployment_net_prefix: "24"
+satellite_deployment_gw_address: "192.168.0.1"
+satellite_deployment_net_interface: "ens192"
+satellite_deployment_subnet_name: "sat_subnet1"
+satellite_deployment_plugin_ports: []
+
+
+#DNS
+satellite_deployment_dns: "false"
+satellite_deployment_dns_interface: "{{ satellite_deployment_net_interface }}"
+satellite_deployment_dns_forwarder: "[]"
+satellite_deployment_dns_zone: "example.com"
+satellite_deployment_dns_reverse_zone: "0.168.192.in-addr.arpa"
+
+#DHCP
+satellite_deployment_dhcp: "false"
+satellite_deployment_dhcp_interface: "{{ satellite_deployment_net_interface }}"
+satellite_deployment_dhcp_start: "192.168.0.1"
+satellite_deployment_dhcp_end: "192.168.0.10"
+
+#TFTP
+satellite_deployment_tftp: "false"
+satellite_deployment_plugin_packages:
+  - "foreman-discovery-image"

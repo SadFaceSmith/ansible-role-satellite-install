@@ -1,0 +1,8 @@
+---
+- name: Satellite Install Role
+  hosts: all
+  become: true
+  tasks:
+    - name: import_role for ansible-role-satellite6-install
+      import_role: 
+        name: ../roles/ansible-role-satellite6-install

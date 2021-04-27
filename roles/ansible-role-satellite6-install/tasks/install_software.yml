@@ -1,0 +1,26 @@
+---
+
+#Install the base software
+- name: Update all packages
+  become: yes
+  yum:
+    name: '*'
+    state: latest
+  when: satellite_deployment_update_all | bool
+  
+  - name: "Install_software"
+  become: "yes"
+  yum:
+    name: '{{ satellite_deployment_packages[satellite_deployment_version | string] + satellite_deployment_extra_packages + 
+satellite_deployment_plugin_packages }}'
+    state: "latest"
+  tags:
+    - "install"
+    - "update_satellite"
+    - "skip_ansible_lint" # ANSIBLE0010
+
+- name: reboot
+  become: yes
+  reboot:
+  when: satellite_deployment_update_all | bool
+

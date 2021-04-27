@@ -1,0 +1,9 @@
+---
+- name: Satellite Install Role
+  hosts: satellite
+  become: true
+  vars_files: ../vars/main.yml
+  tasks:
+    - name: import_role for ansible-role-satellite6-install
+      import_role: 
+        name: ../../ansible-role-satellite6-install

@@ -1,0 +1,16 @@
+---
+- name: "Update satellite-installer command"
+  set_fact:
+    satellite_deployment_installer_cmd: "{{ satellite_deployment_installer_cmd
+      }} --{{ item.key }}='{{ item.value }}'"
+  with_dict: "{{ satellite_deployment_answers }}"
+  tags:
+  - "install_satellite"
+  - "update_satellite"
+
+
+- name: "Satellite installation"
+  shell: "{{ satellite_deployment_installer_cmd }}"
+ 
+ 
+

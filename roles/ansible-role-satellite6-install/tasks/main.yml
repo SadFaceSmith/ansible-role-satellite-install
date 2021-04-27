@@ -1,0 +1,9 @@
+---
+- include: registration.yml
+  when: satellite_connected | bool
+- include: firewall.yml
+- include: fips_enable.yml
+  when: satellite_deployment_fips_enable | bool
+- include: install_software.yml
+- include: install_satellite.yml
+- include: configure_satellite.yml
